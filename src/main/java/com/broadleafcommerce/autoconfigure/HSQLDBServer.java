@@ -31,6 +31,8 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.net.InetAddress;
+import java.net.Socket;
+import java.net.UnknownHostException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -67,36 +69,61 @@ public class HSQLDBServer implements SmartLifecycle {
     @Override
     public boolean isRunning() {
         boolean isRunning = false;
-        
+        Connection c = null;
+
+        final int port = props.getIntegerProperty("server.port", 0);
         try {
             Class.forName("org.hsqldb.jdbc.JDBCDriver");
             final String url = "jdbc:hsqldb:hsql://" + InetAddress.getByName(null).getHostName() + ":"
-                               + props.getIntegerProperty("server.port", 0) + "/"
-                               + props.getProperty("server.dbname.0", "broadleaf");
+                               + port + "/"
+                               + props.getProperty("server.dbname.0", "");
             final String username = "SA";
             final String password = "";
-            final Connection c = DriverManager.getConnection(url, username, password);
-
-            isRunning = true;
             
-            c.close();
+            c = DriverManager.getConnection(url, username, password);
+            
+            isRunning = true;
         } catch (ClassNotFoundException e) {
-            LOG.error("ERROR: failed to load HSQLDB JDBC driver.", e);
-        } catch (SQLException ignored) {
-        } catch (Exception e) {
-            LOG.error(e.getMessage(), e);
+            LOG.error("ERROR: Cannot test if an HSQL server is running: failed to load HSQLDB JDBC driver.", e);
+        } catch (SQLException e) {
+            Socket s = null;
+            try {
+                // see if the port is being used already (by something other than HSQL)
+                s = new Socket(InetAddress.getByName(null), port);
+                LOG.error("Port," + port + ", is already in use but not by HSQL");
+            } catch (Exception ignored) {
+                // otherwise, it's not in use, yet
+                LOG.info("HSQL server is not running.");
+            } finally {
+                closeConnectionQuietly(s);
+            }
+        } catch (UnknownHostException e) {
+            LOG.error("ERROR: An error occurred while testing whether an HSQL server is running.", e);
+        } finally {
+            closeConnectionQuietly(c);
         }
         
         return isRunning;
+    }
+    
+    protected void closeConnectionQuietly(AutoCloseable c) {
+        if (c != null) {
+            try {
+                c.close();
+            } catch (Exception ignored){}
+        }
     }
 
     @Override
     public void start() {
         // Extra isRunning() check since this is invoked on construction
-        if (server == null && !isRunning()) {
+        final boolean isRunning = props != null && isRunning();
+        
+        if (server == null && !isRunning) {
             LOG.info("Starting HSQL server...");
             LOG.warn("HSQL embedded database server is for demonstration purposes only and is not intended for production usage.");
             server = new Server();
+            
             try {
                 server.setProperties(props);
                 serverThread = new Thread(new Runnable() {
@@ -108,11 +135,11 @@ public class HSQLDBServer implements SmartLifecycle {
                 }, "HSQLDB Background Thread");
                 serverThread.setDaemon(true);
                 serverThread.start();
-            } catch (ServerAcl.AclFormatException afe) {
-                LOG.error("Error starting HSQL server.", afe);
-            } catch (IOException e) {
+            } catch (ServerAcl.AclFormatException | IOException e) {
                 LOG.error("Error starting HSQL server.", e);
             }
+        } else if (isRunning) {
+            LOG.info("HSQL server is already running. Will not start a new instance.");
         }
     }
 
