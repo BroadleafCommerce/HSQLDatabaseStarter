@@ -31,7 +31,9 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.net.InetAddress;
-import java.net.Socket;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Properties;
 
@@ -64,11 +66,28 @@ public class HSQLDBServer implements SmartLifecycle {
 
     @Override
     public boolean isRunning() {
-        try (Socket ignored = new Socket(InetAddress.getByName(null), props.getIntegerProperty("server.port", 0))) {
-            return true;
-        } catch (IOException ignored) {
-            return false;
+        boolean isRunning = false;
+        
+        try {
+            Class.forName("org.hsqldb.jdbc.JDBCDriver");
+            final String url = "jdbc:hsqldb:hsql://" + InetAddress.getByName(null).getHostName() + ":"
+                               + props.getIntegerProperty("server.port", 0) + "/"
+                               + props.getProperty("server.dbname.0", "broadleaf");
+            final String username = "SA";
+            final String password = "";
+            final Connection c = DriverManager.getConnection(url, username, password);
+
+            isRunning = true;
+            
+            c.close();
+        } catch (ClassNotFoundException e) {
+            LOG.error("ERROR: failed to load HSQLDB JDBC driver.", e);
+        } catch (SQLException ignored) {
+        } catch (Exception e) {
+            LOG.error(e.getMessage(), e);
         }
+        
+        return isRunning;
     }
 
     @Override
