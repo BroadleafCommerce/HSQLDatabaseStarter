@@ -69,7 +69,7 @@ public class HSQLDBServer implements SmartLifecycle {
     public boolean isRunning() {
         boolean isRunning = false;
         final int port = props.getIntegerProperty("server.port", 0);
-        final String url = "jdbc:hsqldb:hsql://localhost:" + port + "/"
+        final String url = "jdbc:hsqldb:hsql://127.0.0.1:" + port + "/"
                            + props.getProperty("server.dbname.0", "");
         final String username = "SA";
         final String password = "";
