@@ -32,7 +32,6 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
-import java.net.UnknownHostException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -69,49 +68,28 @@ public class HSQLDBServer implements SmartLifecycle {
     @Override
     public boolean isRunning() {
         boolean isRunning = false;
-        Connection c = null;
-
         final int port = props.getIntegerProperty("server.port", 0);
-        try {
-            Class.forName("org.hsqldb.jdbc.JDBCDriver");
-            final String url = "jdbc:hsqldb:hsql://" + InetAddress.getByName(null).getHostName() + ":"
-                               + port + "/"
-                               + props.getProperty("server.dbname.0", "");
-            final String username = "SA";
-            final String password = "";
-            
-            c = DriverManager.getConnection(url, username, password);
-            
+        final String url = "jdbc:hsqldb:hsql://localhost:" + port + "/"
+                           + props.getProperty("server.dbname.0", "");
+        final String username = "SA";
+        final String password = "";
+        
+        try (Connection ignored = DriverManager.getConnection(url, username, password)) {
             isRunning = true;
-        } catch (ClassNotFoundException e) {
-            LOG.error("ERROR: Cannot test if an HSQL server is running: failed to load HSQLDB JDBC driver.", e);
         } catch (SQLException e) {
-            Socket s = null;
-            try {
+            try (Socket ignored = new Socket(InetAddress.getByName(null), port)) {
                 // see if the port is being used already (by something other than HSQL)
-                s = new Socket(InetAddress.getByName(null), port);
-                LOG.error("Port," + port + ", is already in use but not by HSQL");
+                LOG.error("Port," + port + ", is already in use but not by HSQL. "
+                          + "To find out the ID of the process using that port, open a terminal. Then, "
+                          + "if on Mac OS or Linux, use `lsof -i :" + port + "`, "
+                          + "or, if on Windows, use `netstat -ano | findstr " + port + "`.");
             } catch (Exception ignored) {
                 // otherwise, it's not in use, yet
                 LOG.info("HSQL server is not running.");
-            } finally {
-                closeConnectionQuietly(s);
             }
-        } catch (UnknownHostException e) {
-            LOG.error("ERROR: An error occurred while testing whether an HSQL server is running.", e);
-        } finally {
-            closeConnectionQuietly(c);
         }
         
         return isRunning;
-    }
-    
-    protected void closeConnectionQuietly(AutoCloseable c) {
-        if (c != null) {
-            try {
-                c.close();
-            } catch (Exception ignored){}
-        }
     }
 
     @Override
