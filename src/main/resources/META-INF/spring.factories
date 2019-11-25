@@ -1,1 +1,3 @@
-org.springframework.boot.autoconfigure.EnableAutoConfiguration=com.broadleafcommerce.autoconfigure.HSQLDatabaseAutoConfiguration
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=com.broadleafcommerce.hsqldb.autoconfigure.HSQLDatabaseAutoConfiguration
+
+org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase=com.broadleafcommerce.hsqldb.autoconfigure.HSQLDatabaseAutoConfiguration

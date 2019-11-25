@@ -10,11 +10,11 @@
  * "Custom License") between you and Broadleaf Commerce. You may not use this file except in
  * compliance with the applicable license. #L%
  */
-package com.broadleafcommerce.autoconfigure;
+package com.broadleafcommerce.hsqldb.autoconfigure;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -39,15 +39,15 @@ import javax.sql.DataSource;
 @AutoConfigureBefore(JpaRepositoriesAutoConfiguration.class)
 public class HSQLDatabaseAutoConfiguration {
 
-    @Autowired
-    protected HSQLDBProperties props;
+    private final HSQLDBProperties props;
 
-    @Autowired
-    protected Environment environment;
+    public HSQLDatabaseAutoConfiguration(HSQLDBProperties props) {
+        this.props = props;
+    }
 
     @ConditionalOnMissingBean(name = {"blDS", "webDS"})
     @Bean
-    public HSQLDBServer blEmbeddedDatabase() {
+    public HSQLDBServer blEmbeddedDatabase(Environment environment) {
         return new HSQLDBServer(props, environment);
     }
 
@@ -56,40 +56,51 @@ public class HSQLDatabaseAutoConfiguration {
     @Bean
     @Primary
     public DataSource blDS() {
-        return buildDataSource();
+        return buildDataSource(props.getPort(), props.getDbName());
     }
 
-    @ConditionalOnMissingBean(name = {"webSecureDS"})
-    @DependsOn("blEmbeddedDatabase")
-    @Bean
-    public DataSource webSecureDS() {
-        return buildDataSource();
+    @Configuration
+    @ConditionalOnBean(name = "blMergedDataSources")
+    public static class MultiDatasourceConfiguration {
+
+        private final HSQLDBProperties props;
+
+        public MultiDatasourceConfiguration(HSQLDBProperties props) {
+            this.props = props;
+        }
+
+        @ConditionalOnMissingBean(name = {"webSecureDS"})
+        @DependsOn("blEmbeddedDatabase")
+        @Bean
+        public DataSource webSecureDS() {
+            return buildDataSource(props.getPort(), props.getDbName());
+        }
+
+        @ConditionalOnMissingBean(name = {"webStorageDS"})
+        @DependsOn("blEmbeddedDatabase")
+        @Bean
+        public DataSource webStorageDS() {
+            return buildDataSource(props.getPort(), props.getDbName());
+        }
+
+        @ConditionalOnMissingBean(name = {"webEventDS"})
+        @DependsOn("blEmbeddedDatabase")
+        @Bean
+        public DataSource webEventDS() {
+            return buildDataSource(props.getPort(), props.getDbName());
+        }
+
+        @ConditionalOnMissingBean(name = {"demoDS"})
+        @ConditionalOnClass(name = "com.blcdemo.core.domain.PDSite")
+        @DependsOn("blEmbeddedDatabase")
+        @Bean
+        public DataSource demoDS() {
+            return buildDataSource(props.getPort(), props.getDbName());
+        }
     }
 
-    @ConditionalOnMissingBean(name = {"webStorageDS"})
-    @DependsOn("blEmbeddedDatabase")
-    @Bean
-    public DataSource webStorageDS() {
-        return buildDataSource();
-    }
-
-    @ConditionalOnMissingBean(name = {"webEventDS"})
-    @DependsOn("blEmbeddedDatabase")
-    @Bean
-    public DataSource webEventDS() {
-        return buildDataSource();
-    }
-
-    @ConditionalOnMissingBean(name = {"demoDS"})
-    @ConditionalOnClass(name = "com.blcdemo.core.domain.PDSite")
-    @DependsOn("blEmbeddedDatabase")
-    @Bean
-    public DataSource demoDS() {
-        return buildDataSource();
-    }
-
-    protected DataSource buildDataSource() {
-        String url = "jdbc:hsqldb:hsql://127.0.0.1:" + props.getPort() + "/" + props.getDbName();
+    protected static DataSource buildDataSource(int port, String dbName) {
+        String url = "jdbc:hsqldb:hsql://127.0.0.1:" + port + "/" + dbName;
         DatabaseDriver driver = DatabaseDriver.fromJdbcUrl(url);
         HikariDataSource ds = DataSourceBuilder
                 .create()

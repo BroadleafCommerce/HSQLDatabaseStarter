@@ -10,7 +10,7 @@
  * "Custom License") between you and Broadleaf Commerce. You may not use this file except in
  * compliance with the applicable license. #L%
  */
-package com.broadleafcommerce.autoconfigure;
+package com.broadleafcommerce.hsqldb.autoconfigure;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -23,7 +23,6 @@ import org.springframework.util.FileSystemUtils;
 import org.springframework.util.StringUtils;
 
 import java.io.File;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
@@ -72,7 +71,7 @@ public class HSQLDBServer implements SmartLifecycle {
         final String username = "SA";
         final String password = "";
 
-        try (Connection ignored = DriverManager.getConnection(url, username, password)) {
+        try (Connection ignored = DriverManager.getConnection(url, username, password)) { // NOSONAR
             isRunning = true;
         } catch (SQLException e) {
             try (Socket ignored = new Socket(InetAddress.getByName(null), port)) {
@@ -104,13 +103,7 @@ public class HSQLDBServer implements SmartLifecycle {
 
             try {
                 server.setProperties(props);
-                serverThread = new Thread(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        server.start();
-                    }
-                }, "HSQLDB Background Thread");
+                serverThread = new Thread(() -> server.start(), "HSQLDB Background Thread");
                 serverThread.setDaemon(true);
                 serverThread.start();
             } catch (ServerAcl.AclFormatException | IOException e) {
@@ -193,12 +186,8 @@ public class HSQLDBServer implements SmartLifecycle {
             }
         }
         if (dbFile.exists() && dbFile.isDirectory() && clearState) {
-            File[] myDBContents = dbFile.listFiles(new FilenameFilter() {
-                @Override
-                public boolean accept(File dir, String name) {
-                    return name.startsWith(autoProps.getDbName() + ".");
-                }
-            });
+            File[] myDBContents = dbFile.listFiles(
+                    (File dir, String name) -> name.startsWith(autoProps.getDbName() + "."));
             for (File item : myDBContents) {
                 boolean deleted = FileSystemUtils.deleteRecursively(item);
                 if (!deleted) {
