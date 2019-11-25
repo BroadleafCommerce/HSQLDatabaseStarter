@@ -10,7 +10,7 @@
  * "Custom License") between you and Broadleaf Commerce. You may not use this file except in
  * compliance with the applicable license. #L%
  */
-package com.broadleafcommerce.autoconfigure;
+package com.broadleafcommerce.hsqldb.autoconfigure;
 
 import org.hibernate.dialect.HSQLDialect;
 
