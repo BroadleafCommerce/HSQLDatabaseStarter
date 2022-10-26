@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.broadleafcommerce</groupId>
         <artifactId>broadleaf-module-parent</artifactId>
-        <version>3.3.3-SNAPSHOT</version>
+        <version>3.3.3-GA</version>
     </parent>
 
     <name>BroadleafCommerce HSQLDB Database Starter</name>
@@ -15,6 +15,14 @@
     <version>2.3.2-SNAPSHOT</version>
     <packaging>jar</packaging>
     <url>https://www.broadleafcommerce.com</url>
+    
+    <properties>
+        <project.uri>${project.baseUri}</project.uri>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <spring.boot.version>2.6.7</spring.boot.version>
+        <tomcat.jdbc.version>8.5.32</tomcat.jdbc.version>        
+    </properties>
 
     <licenses>
         <license>
@@ -30,7 +38,6 @@
             <comments>Commercial License Applicable When Bounds of Fair Use License Are Exceeded</comments>
         </license>
     </licenses>
-
     <developers>
         <developer>
             <id>architect</id>
@@ -40,15 +47,6 @@
             <timezone>-6</timezone>
         </developer>
     </developers>
-
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <spring.boot.version>2.6.7</spring.boot.version>
-        <tomcat.jdbc.version>8.5.32</tomcat.jdbc.version>
-        <project.uri>${project.baseUri}</project.uri>
-    </properties>
-
     <scm>
         <connection>scm:git:git@github.com:BroadleafCommerce/HSQLDatabaseStarter.git</connection>
         <developerConnection>scm:git:git@github.com:BroadleafCommerce/HSQLDatabaseStarter.git</developerConnection>
