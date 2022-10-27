@@ -45,8 +45,8 @@
         <project.uri>${project.baseUri}</project.uri>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <spring.boot.version>2.6.7</spring.boot.version>
-        <tomcat.jdbc.version>8.5.32</tomcat.jdbc.version>        
+        <spring.boot.version>2.7.3</spring.boot.version>
+        <tomcat.jdbc.version>8.5.32</tomcat.jdbc.version>
     </properties>
 
     <scm>
