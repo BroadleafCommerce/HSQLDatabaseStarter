@@ -39,7 +39,9 @@ public class HSQLDBProperties {
      * The working directory in the local file system where the database related files will be stored, ending in a trailing
      * slash
      */
-    protected String workingDirectory = (System.getProperty("java.io.tmpdir") + File.separator + "broadleaf-hsqldb" + File.separator).replace("//", "/").replace("\\/", "\\");
+    protected String workingDirectory = (System.getProperty("java.io.tmpdir") + File.separator + "broadleaf-hsqldb" + File.separator)
+            .replace("//", "/")
+            .replace("\\\\", "\\");
     /**
      * Whether or not any database related files stored in the file system are wiped before launch. This guarantees a fresh environment.
      */
