@@ -20,8 +20,8 @@
         <project.uri>${project.baseUri}</project.uri>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <spring.boot.version>2.7.5</spring.boot.version>
-        <tomcat.jdbc.version>8.5.32</tomcat.jdbc.version>
+        <spring.boot.version>3.0.6</spring.boot.version>
+        <tomcat.jdbc.version>10.1.8</tomcat.jdbc.version>
     </properties>
     <licenses>
         <license>
@@ -116,7 +116,7 @@
         <dependency>
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
-            <version>1.4</version>
+            <version>1.15</version>
         </dependency>
     </dependencies>
 
