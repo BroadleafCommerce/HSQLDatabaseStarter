@@ -20,7 +20,7 @@
         <project.uri>${project.baseUri}</project.uri>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <spring.boot.version>2.7.8</spring.boot.version>
+        <spring.boot.version>2.7.12</spring.boot.version>
         <tomcat.jdbc.version>8.5.32</tomcat.jdbc.version>        
     </properties>
 
