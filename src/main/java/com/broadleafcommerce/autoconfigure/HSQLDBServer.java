@@ -164,16 +164,16 @@ public class HSQLDBServer implements SmartLifecycle {
         boolean clearState = autoProps.getClearState();
         boolean isPropertyClear = autoProps.getClearStateOnPropertyOnly();
         if (isPropertyClear) {
-            if (StringUtils.isEmpty(autoProps.getClearStateProperty())) {
+            if (StringUtils.hasText(autoProps.getClearStateProperty())) {
                 LOG.warn("clearStateOnPropertyOnly was set to true, but a clearStateProperty was not defined. Not clearing database state based on the property.");
                 clearState = false;
             } else {
                 String propVal = environment.getProperty(autoProps.getClearStateProperty());
-                if (StringUtils.isEmpty(propVal)) {
+                if (StringUtils.hasText(propVal)) {
                     LOG.warn(String.format("Unable to find the %s property in the Spring environment. Not clearing database state based on the property.", autoProps.getClearStateProperty()));
                     clearState = false;
                 } else {
-                    if (!StringUtils.isEmpty(autoProps.getClearStatePropertyValues())) {
+                    if (!StringUtils.hasText(autoProps.getClearStatePropertyValues())) {
                         String[] vals = autoProps.getClearStatePropertyValues().split(";");
                         Arrays.sort(vals);
                         if (Arrays.binarySearch(vals, propVal) < 0) {
@@ -184,12 +184,7 @@ public class HSQLDBServer implements SmartLifecycle {
             }
         }
         if (dbFile.exists() && dbFile.isDirectory() && clearState) {
-            File[] myDBContents = dbFile.listFiles(new FilenameFilter() {
-                @Override
-                public boolean accept(File dir, String name) {
-                    return name.startsWith(autoProps.getDbName() + ".");
-                }
-            });
+            File[] myDBContents = dbFile.listFiles((dir, name) -> name.startsWith(autoProps.getDbName() + "."));
             for (File item : myDBContents) {
                 boolean deleted = FileSystemUtils.deleteRecursively(item);
                 if (!deleted) {
