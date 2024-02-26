@@ -10,15 +10,13 @@
  * the Broadleaf End User License Agreement (EULA), Version 1.1
  * (the "Commercial License" located at http://license.broadleafcommerce.org/commercial_license-1.1.txt)
  * shall apply.
- * 
+ *
  * Alternatively, the Commercial License may be replaced with a mutually agreed upon license (the "Custom License")
  * between you and Broadleaf Commerce. You may not use this file except in compliance with the applicable license.
  * #L%
  */
 package com.broadleafcommerce.autoconfigure;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -44,21 +42,19 @@ import javax.sql.DataSource;
 @AutoConfigureAfter(name = "com.broadleafcommerce.autoconfigure.DatabaseAutoConfiguration")
 public class HSQLDatabaseAutoConfiguration {
 
-    private static final Log LOG = LogFactory.getLog(HSQLDatabaseAutoConfiguration.class);
-
     @Autowired
     protected HSQLDBProperties props;
 
     @Autowired
     protected Environment environment;
 
-    @ConditionalOnMissingBean(name="webDS")
+    @ConditionalOnMissingBean(name = "webDS")
     @Bean
     public HSQLDBServer blEmbeddedDatabase() {
         return new HSQLDBServer(props, environment);
     }
 
-    @ConditionalOnMissingBean(name={"webDS"})
+    @ConditionalOnMissingBean(name = {"webDS"})
     @DependsOn("blEmbeddedDatabase")
     @Bean
     @Primary
@@ -66,29 +62,29 @@ public class HSQLDatabaseAutoConfiguration {
         return buildDataSource();
     }
 
-    @ConditionalOnMissingBean(name={"webSecureDS"})
+    @ConditionalOnMissingBean(name = {"webSecureDS"})
     @DependsOn("blEmbeddedDatabase")
     @Bean
     public DataSource webSecureDS() {
         return buildDataSource();
     }
 
-    @ConditionalOnMissingBean(name={"webStorageDS"})
+    @ConditionalOnMissingBean(name = {"webStorageDS"})
     @DependsOn("blEmbeddedDatabase")
     @Bean
     public DataSource webStorageDS() {
         return buildDataSource();
     }
 
-    @ConditionalOnMissingBean(name={"webEventDS"})
+    @ConditionalOnMissingBean(name = {"webEventDS"})
     @DependsOn("blEmbeddedDatabase")
     @Bean
     public DataSource webEventDS() {
         return buildDataSource();
     }
 
-    @ConditionalOnMissingBean(name={"demoDS"})
-    @ConditionalOnClass(name= "com.blcdemo.core.domain.PDSite")
+    @ConditionalOnMissingBean(name = {"demoDS"})
+    @ConditionalOnClass(name = "com.blcdemo.core.domain.PDSite")
     @DependsOn("blEmbeddedDatabase")
     @Bean
     public DataSource demoDS() {
