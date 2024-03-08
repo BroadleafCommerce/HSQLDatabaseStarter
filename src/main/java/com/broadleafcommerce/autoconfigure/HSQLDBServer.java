@@ -10,7 +10,7 @@
  * the Broadleaf End User License Agreement (EULA), Version 1.1
  * (the "Commercial License" located at http://license.broadleafcommerce.org/commercial_license-1.1.txt)
  * shall apply.
- * 
+ *
  * Alternatively, the Commercial License may be replaced with a mutually agreed upon license (the "Custom License")
  * between you and Broadleaf Commerce. You may not use this file except in compliance with the applicable license.
  * #L%
@@ -28,7 +28,6 @@ import org.springframework.util.FileSystemUtils;
 import org.springframework.util.StringUtils;
 
 import java.io.File;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
@@ -58,9 +57,9 @@ public class HSQLDBServer implements SmartLifecycle {
         databaseConfig.setProperty("server.remote_open", "true");
         databaseConfig.setProperty("hsqldb.reconfig_logging", "false");
         databaseConfig.setProperty("server.port", Integer.toString(autoProps.getPort()));
-        
+
         this.props = new HsqlProperties(databaseConfig);
-        
+
         // start on construction since we need this to be active immediately
         start();
     }
@@ -70,26 +69,26 @@ public class HSQLDBServer implements SmartLifecycle {
         boolean isRunning = false;
         final int port = props.getIntegerProperty("server.port", 0);
         final String url = "jdbc:hsqldb:hsql://127.0.0.1:" + port + "/"
-                           + props.getProperty("server.dbname.0", "");
+                + props.getProperty("server.dbname.0", "");
         final String username = "SA";
         final String password = "";
-        
+
         try (Connection ignored = DriverManager.getConnection(url, username, password)) {
             isRunning = true;
         } catch (SQLException e) {
             try (Socket ignored = new Socket(InetAddress.getByName(null), port)) {
                 // see if the port is being used already (by something other than HSQL)
                 LOG.error("Port," + port + ", is already in use but not by HSQL. "
-                          + "To find out the ID of the process using that port, open a terminal. Then, "
-                          + "if on Mac OS or Linux, use `lsof -i :" + port + "`, "
-                          + "or, if on Windows, use `netstat -ano | findstr " + port + "`.");
+                        + "To find out the ID of the process using that port, open a terminal. Then, "
+                        + "if on Mac OS or Linux, use `lsof -i :" + port + "`, "
+                        + "or, if on Windows, use `netstat -ano | findstr " + port + "`.");
                 isRunning = true;
             } catch (Exception ignored) {
                 // otherwise, it's not in use, yet
                 LOG.info("HSQL server is not running.");
             }
         }
-        
+
         return isRunning;
     }
 
@@ -97,16 +96,16 @@ public class HSQLDBServer implements SmartLifecycle {
     public void start() {
         // Extra isRunning() check since this is invoked on construction
         final boolean isRunning = props != null && isRunning();
-        
+
         if (server == null && !isRunning) {
             LOG.info("Starting HSQL server...");
             LOG.warn("HSQL embedded database server is for demonstration purposes only and is not intended for production usage.");
             server = new Server();
-            
+
             try {
                 server.setProperties(props);
                 serverThread = new Thread(new Runnable() {
-                    
+
                     @Override
                     public void run() {
                         server.start();
@@ -127,7 +126,7 @@ public class HSQLDBServer implements SmartLifecycle {
         if (server != null && serverThread != null) {
             LOG.info("Stopping HSQL server...");
             server.shutdown();
-            
+
             // It is expected that the thread will exit after
             // the server is shutdown; this will block until
             // the shutdown is complete.
@@ -170,7 +169,10 @@ public class HSQLDBServer implements SmartLifecycle {
             } else {
                 String propVal = environment.getProperty(autoProps.getClearStateProperty());
                 if (StringUtils.hasText(propVal)) {
-                    LOG.warn(String.format("Unable to find the %s property in the Spring environment. Not clearing database state based on the property.", autoProps.getClearStateProperty()));
+                    LOG.warn(String.format(
+                            "Unable to find the %s property in the Spring environment. Not clearing database state based on the property.",
+                            autoProps.getClearStateProperty())
+                    );
                     clearState = false;
                 } else {
                     if (!StringUtils.hasText(autoProps.getClearStatePropertyValues())) {
@@ -188,7 +190,10 @@ public class HSQLDBServer implements SmartLifecycle {
             for (File item : myDBContents) {
                 boolean deleted = FileSystemUtils.deleteRecursively(item);
                 if (!deleted) {
-                    LOG.warn(String.format("Unable to clear previous temporary database file (%s). As a result, previous, unwanted values may be utilized during this run.", item.getAbsolutePath()));
+                    LOG.warn(String.format(
+                            "Unable to clear previous temporary database file (%s). As a result, previous, unwanted values may be utilized during this run.",
+                            item.getAbsolutePath())
+                    );
                 }
             }
         }
