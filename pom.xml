@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.broadleafcommerce</groupId>
         <artifactId>broadleaf-module-parent</artifactId>
-        <version>4.0.2-GA</version>
+        <version>4.0.3-SNAPSHOT</version>
     </parent>
 
     <name>BroadleafCommerce HSQLDB Database Starter</name>
@@ -20,7 +20,7 @@
         <project.uri>${project.baseUri}</project.uri>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <tomcat.jdbc.version>10.1.40</tomcat.jdbc.version>
+        <tomcat.jdbc.version>10.1.44</tomcat.jdbc.version>
     </properties>
     <licenses>
         <license>
