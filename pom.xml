@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.broadleafcommerce</groupId>
         <artifactId>broadleaf-module-parent</artifactId>
-        <version>3.3.7-GA</version>
+        <version>3.3.9-SNAPSHOT</version>
     </parent>
 
     <name>BroadleafCommerce HSQLDB Database Starter</name>
@@ -15,13 +15,13 @@
     <version>2.3.7-SNAPSHOT</version>
     <packaging>jar</packaging>
     <url>https://www.broadleafcommerce.com</url>
-    
+
     <properties>
         <project.uri>${project.baseUri}</project.uri>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <spring.boot.version>2.7.18</spring.boot.version>
-        <tomcat.jdbc.version>8.5.32</tomcat.jdbc.version>        
+        <tomcat.jdbc.version>9.0.112</tomcat.jdbc.version>
     </properties>
 
     <licenses>
